@@ -9,6 +9,7 @@ import { StagingAreaToolbarImageCountButton } from 'features/controlLayers/compo
 import { StagingAreaToolbarMenu } from 'features/controlLayers/components/StagingArea/StagingAreaToolbarMenu';
 import { StagingAreaToolbarNextButton } from 'features/controlLayers/components/StagingArea/StagingAreaToolbarNextButton';
 import { StagingAreaToolbarPrevButton } from 'features/controlLayers/components/StagingArea/StagingAreaToolbarPrevButton';
+import { StagingAreaToolbarSaveAllToGalleryButton } from 'features/controlLayers/components/StagingArea/StagingAreaToolbarSaveAllToGalleryButton';
 import { StagingAreaToolbarSaveSelectedToGalleryButton } from 'features/controlLayers/components/StagingArea/StagingAreaToolbarSaveSelectedToGalleryButton';
 import { StagingAreaToolbarToggleShowResultsButton } from 'features/controlLayers/components/StagingArea/StagingAreaToolbarToggleShowResultsButton';
 import { useCanvasManager } from 'features/controlLayers/contexts/CanvasManagerProviderGate';
@@ -42,6 +43,7 @@ export const StagingAreaToolbar = memo(() => {
         <StagingAreaToolbarAcceptButton />
         <StagingAreaToolbarToggleShowResultsButton />
         <StagingAreaToolbarSaveSelectedToGalleryButton />
+        <StagingAreaToolbarSaveAllToGalleryButton />
         <StagingAreaToolbarMenu />
         <StagingAreaToolbarDiscardSelectedButton isDisabled={!shouldShowStagedImage} />
         <StagingAreaToolbarDiscardAllButton isDisabled={!shouldShowStagedImage} />

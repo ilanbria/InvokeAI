@@ -1934,6 +1934,10 @@
         "cropLayerToBbox": "Crop Layer to Bbox",
         "savedToGalleryOk": "Saved to Gallery",
         "savedToGalleryError": "Error saving to gallery",
+        "savedAllToGalleryOk": "Saved {{count}} images to Gallery",
+        "savedAllToGalleryError": "Error saving images to gallery",
+        "savedAllToGalleryPartial": "Saved {{success}} images to Gallery ({{failed}} failed)",
+        "noImagesToSave": "No images to save",
         "regionCopiedToClipboard": "{{region}} Copied to Clipboard",
         "copyRegionError": "Error copying {{region}}",
         "newGlobalReferenceImageOk": "Created Global Reference Image",
@@ -2374,6 +2378,7 @@
             "previous": "Previous",
             "next": "Next",
             "saveToGallery": "Save To Gallery",
+            "saveAllToGallery": "Save All To Gallery",
             "showResultsOn": "Showing Results",
             "showResultsOff": "Hiding Results"
         }
