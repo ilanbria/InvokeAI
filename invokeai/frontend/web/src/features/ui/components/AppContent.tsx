@@ -20,11 +20,15 @@ import { ModelsTabAutoLayout } from 'features/ui/layouts/models-tab-auto-layout'
 import { navigationApi } from 'features/ui/layouts/navigation-api';
 import { QueueTabAutoLayout } from 'features/ui/layouts/queue-tab-auto-layout';
 import { UpscalingTabAutoLayout } from 'features/ui/layouts/upscaling-tab-auto-layout';
+import { useNavigationApi } from 'features/ui/layouts/use-navigation-api';
 import { WorkflowsTabAutoLayout } from 'features/ui/layouts/workflows-tab-auto-layout';
 import { selectActiveTab } from 'features/ui/store/uiSelectors';
 import { memo } from 'react';
 
 export const AppContent = memo(() => {
+  // Initialize NavigationApi connection to Redux store
+  useNavigationApi();
+
   return (
     <Flex position="relative" w="full" h="full" overflow="hidden">
       <VerticalNavBar />
