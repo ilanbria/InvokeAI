@@ -2,6 +2,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Optional, Union
 from zipfile import ZipFile
+import urllib.parse
 
 from invokeai.app.services.board_records.board_records_common import BoardRecordNotFoundException
 from invokeai.app.services.bulk_download.bulk_download_base import BulkDownloadBase
@@ -142,10 +143,64 @@ class BulkDownloadService(BulkDownloadBase):
         Path(path).unlink()
 
     def get_path(self, bulk_download_item_name: str) -> str:
-        path = str(self._bulk_downloads_folder / bulk_download_item_name)
-        if not self._is_valid_path(path):
+        # Validate input is not empty
+        if not bulk_download_item_name or not bulk_download_item_name.strip():
+            raise BulkDownloadTargetException("Empty bulk download item name not allowed")
+        
+        # URL decode the filename to handle encoded path traversal sequences
+        try:
+            decoded_name = urllib.parse.unquote(bulk_download_item_name)
+        except Exception:
+            decoded_name = bulk_download_item_name
+        
+        # Check for path traversal sequences - look for dangerous patterns
+        # Check for ".." (parent directory references) as complete components
+        # We need to check for ".." surrounded by separators or at the start/end
+        def contains_parent_dir_ref(name):
+            # Check for ".." at start, end, or surrounded by separators
+            if name == ".." or name.startswith("../") or name.startswith("..\\") or name.endswith("/..") or name.endswith("\\.."):
+                return True
+            # Check for ".." in the middle surrounded by separators
+            if "/.." in name or "\\.." in name or "../" in name or "..\\" in name:
+                return True
+            return False
+        
+        if contains_parent_dir_ref(decoded_name) or contains_parent_dir_ref(bulk_download_item_name):
+            raise BulkDownloadTargetException("Parent directory references not allowed in bulk download item name")
+        
+        # Check for path separators
+        if "/" in decoded_name or "\\" in decoded_name or "/" in bulk_download_item_name or "\\" in bulk_download_item_name:
+            raise BulkDownloadTargetException("Path separators not allowed in bulk download item name")
+        
+        # Check for absolute path indicators
+        if (decoded_name.startswith("/") or bulk_download_item_name.startswith("/") or 
+            ":" in decoded_name or ":" in bulk_download_item_name):
+            raise BulkDownloadTargetException("Absolute paths not allowed in bulk download item name")
+        
+        # Strip any path information from the filename to prevent directory traversal
+        basename = Path(decoded_name).name
+        
+        if basename != decoded_name:
+            raise BulkDownloadTargetException("Invalid bulk download item name, potential directory traversal detected")
+        
+        # Additional check: basename should not be empty or just dots after processing
+        if not basename or basename == "." or basename == "..":
+            raise BulkDownloadTargetException("Invalid bulk download item name")
+        
+        # Construct the full path within the bulk downloads folder
+        path = self._bulk_downloads_folder / basename
+        
+        # Ensure the resolved path is within the bulk downloads folder
+        resolved_base = self._bulk_downloads_folder.resolve()
+        resolved_path = path.resolve()
+        
+        if not resolved_path.is_relative_to(resolved_base):
+            raise BulkDownloadTargetException("Bulk download path outside allowed folder, potential directory traversal detected")
+        
+        if not self._is_valid_path(resolved_path):
             raise BulkDownloadTargetException()
-        return path
+        
+        return str(resolved_path)
 
     def _is_valid_path(self, path: Union[str, Path]) -> bool:
         """Validates the path given for a bulk download."""
