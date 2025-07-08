@@ -1,6 +1,6 @@
 import { logger } from 'app/logging/logger';
 import { getPrefixedId } from 'features/controlLayers/konva/util';
-import { selectMainModelConfig } from 'features/controlLayers/store/paramsSlice';
+import { selectMainModelConfig, selectParamsSlice } from 'features/controlLayers/store/paramsSlice';
 import { selectRefImagesSlice } from 'features/controlLayers/store/refImagesSlice';
 import { isFluxKontextAspectRatioID, isFluxKontextReferenceImageConfig } from 'features/controlLayers/store/types';
 import { getGlobalReferenceImageWarnings } from 'features/controlLayers/store/validators';
@@ -28,6 +28,9 @@ export const buildFluxKontextGraph = (arg: GraphBuilderArg): GraphBuilderReturn 
   if (generationMode !== 'txt2img') {
     throw new UnsupportedGenerationModeError(t('toast.imagenIncompatibleGenerationMode', { model: 'FLUX Kontext' }));
   }
+
+  const params = selectParamsSlice(state);
+  const { guidance } = params;
 
   log.debug({ generationMode, manager: manager?.id }, 'Building FLUX Kontext graph');
 
@@ -65,6 +68,7 @@ export const buildFluxKontextGraph = (arg: GraphBuilderArg): GraphBuilderReturn 
     aspect_ratio: aspectRatio.id,
     input_image,
     prompt_upsampling: true,
+    guidance,
     ...selectCanvasOutputFields(state),
   });
 
@@ -77,6 +81,7 @@ export const buildFluxKontextGraph = (arg: GraphBuilderArg): GraphBuilderReturn 
   );
   g.addEdgeToMetadata(positivePrompt, 'value', 'positive_prompt');
   g.upsertMetadata({
+    guidance,
     model: Graph.getModelMetadataField(model),
     width: originalSize.width,
     height: originalSize.height,
