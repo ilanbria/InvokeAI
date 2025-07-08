@@ -171,11 +171,14 @@ export const useImageActions = (imageDTO: ImageDTO | null) => {
     if (!imageDTO) {
       return;
     }
+    if (!metadata) {
+      return;
+    }
     if (isStaging) {
       return;
     }
-    MetadataUtils.recallDimensions(imageDTO, store);
-  }, [imageDTO, isStaging, store]);
+    MetadataUtils.recallDimensions(metadata, store);
+  }, [imageDTO, metadata, isStaging, store]);
 
   const upscale = useCallback(() => {
     if (!imageDTO) {
